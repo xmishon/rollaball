@@ -1,2 +1,2 @@
 # rollaboll
-Repository for GeekBrains educational project 
+Repository for GeekBrains educational project
