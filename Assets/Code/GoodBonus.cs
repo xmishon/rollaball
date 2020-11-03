@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace mzmeevskiy
 {
@@ -6,21 +8,18 @@ namespace mzmeevskiy
     {
         private Material _material;
         private float _lengthFly;
-        private DisplayBonuses _displayBonuses;
 
-        private static int _totalBonuses = 0;
+        public event Action GoodBonusCaught;
 
         private void Awake()
         {
             _material = GetComponent<Renderer>().material;
             _lengthFly = Random.Range(2.0f, 4.0f);
-            _displayBonuses = new DisplayBonuses();
         }
 
         protected override void Interaction()
         {
-            _totalBonuses += 1;
-            _displayBonuses.Display(_totalBonuses);
+            GoodBonusCaught?.Invoke();
         }
 
         public void Fly()
