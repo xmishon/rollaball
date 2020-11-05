@@ -1,35 +1,51 @@
-﻿using mzmeevskiy;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace mazmeevskiy
+namespace mzmeevskiy
 {
     public sealed class GameController : MonoBehaviour
     {
-        private InteractiveObject[] _interactiveObjects;
-        private BonusController _bonusController;
-        private Display _display;
+        private ListExecuteObject _interactiveObjects;
+        private DisplayEndGame _displayEndGame;
+        private DisplayBonuses _displayBonuses;
+
+        private int _countBonuses;
         private SoundController _soundController;
 
         private void Awake()
         {
             _soundController = GameObject.Find("SoundController").GetComponent<SoundController>();
-            _display = new Display();
-            _bonusController = new BonusController();
-            _bonusController.BonusesChanged += _display.DisplayBonuses;
-            _interactiveObjects = FindObjectsOfType<InteractiveObject>();
+            _displayEndGame = new DisplayEndGame();
+            _displayBonuses = new DisplayBonuses();
+            _interactiveObjects = new ListExecuteObject();
             foreach (InteractiveObject interactiveObject in _interactiveObjects)
             {
                 if (interactiveObject is GoodBonus goodBonus)
                 {
-                    goodBonus.GoodBonusCaught += _bonusController.OnBonusCaught;
-                    goodBonus.GoodBonusCaught += _soundController.PlayBonusPickupSound;
+                    goodBonus.OnPointChange += AddBonus;
+                    goodBonus.OnPointChange += _soundController.PlayBonusPickupSound;
                     continue;
+                }
+                if (interactiveObject is BadBonus badBonus)
+                {
+                    badBonus.OnCaughtPlayerChange += CaughtPlayer;
+                    badBonus.OnCaughtPlayerChange += _displayEndGame.GameOver;
                 }
                 if (interactiveObject is Finish finish)
                 {
-                    finish.GameFinishedAction += _display.DisplayGameFinished;
+                    
                 }
             }
+        }
+
+        private void CaughtPlayer(string value, Color args)
+        {
+            Time.timeScale = 0.0f;
+        }
+
+        private void AddBonus(int value)
+        {
+            _countBonuses += value;
+            _displayBonuses.Display(_countBonuses);
         }
 
         private void Update()
@@ -38,21 +54,27 @@ namespace mazmeevskiy
             {
                 var interactiveObject = _interactiveObjects[i];
                 if (interactiveObject == null)
+                {
                     continue;
-
-                if(interactiveObject is IFly fly)
-                {
-                    fly.Fly();
                 }
 
-                if(interactiveObject is IFlicker flicker)
+                interactiveObject.Execute();
+            }
+        }
+
+        public void Dispose()
+        {
+            foreach(var o in _interactiveObjects)
+            {
+                if (o is BadBonus badBonus)
                 {
-                    flicker.Flicker();
+                    badBonus.OnCaughtPlayerChange -= CaughtPlayer;
+                    badBonus.OnCaughtPlayerChange -= _displayEndGame.GameOver;
                 }
 
-                if(interactiveObject is IRotation rotation)
+                if (o is GoodBonus goodBonus)
                 {
-                    rotation.Rotate();
+                    goodBonus.OnPointChange -= AddBonus;
                 }
             }
         }

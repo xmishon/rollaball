@@ -1,27 +1,26 @@
 ﻿using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
+using static UnityEngine.Random;
 
 namespace mzmeevskiy
 {
-    public class GoodBonus : InteractiveObject, IFly, IFlicker
+    public class BadBonus : InteractiveObject, IFly, IFlicker
     {
-        public int Point;
-        public event Action<int> OnPointChange = delegate (int i) { };
-        private Material _material;
+        public event Action<string, Color> OnCaughtPlayerChange = delegate (string str, Color color) { };
+        private float _speedRotation;
         private float _lengthFly;
 
         public event Action GoodBonusCaught;
 
         private void Awake()
         {
-            _material = GetComponent<Renderer>().material;
-            _lengthFly = Random.Range(2.0f, 3.0f);
+            _speedRotation = Range(1.0f, 5.0f);
+            _lengthFly = Range(2.0f, 3.0f);
         }
 
         protected override void Interaction()
         {
-            OnPointChange?.Invoke(Point);
+            OnCaughtPlayerChange?.Invoke(gameObject.name, _color);
         }
 
         public override void Execute()
@@ -31,7 +30,7 @@ namespace mzmeevskiy
                 return;
             }
             Fly();
-            Flicker();
+            Rotate();
         }
 
         public void Fly()
@@ -39,9 +38,9 @@ namespace mzmeevskiy
             transform.localPosition = new Vector3(transform.localPosition.x, Mathf.PingPong(Time.time, _lengthFly), transform.localPosition.z);
         }
 
-        public void Flicker()
+        public void Rotate()
         {
-            _material.color = new Color(_material.color.r, _material.color.g, _material.color.b, Mathf.PingPong(Time.time, 1.0f));
+            transform.Rotate(Vector3.up * (Time.deltaTime * _speedRotation), Space.World);
         }
     }
 }

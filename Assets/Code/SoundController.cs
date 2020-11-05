@@ -6,7 +6,7 @@ namespace mzmeevskiy
     {
         [SerializeField] private AudioSource _audioSource;
 
-        public void PlayBonusPickupSound()
+        public void PlayBonusPickupSound(int _bonusCount)
         {
             _audioSource.Play();
         }
