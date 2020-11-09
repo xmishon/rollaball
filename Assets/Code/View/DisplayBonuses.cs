@@ -6,9 +6,9 @@ public sealed class DisplayBonuses
 {
     private Text _text;
 
-    public Display()
+    public DisplayBonuses(Text text)
     {
-        
+        _text = text;
     }
 
     public void Display(int value)

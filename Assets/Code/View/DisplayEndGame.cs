@@ -6,12 +6,12 @@ public sealed class DisplayEndGame
 {
     private Text _finishGameLabel;
 
-    public DisplayEndGame()
+    public DisplayEndGame(Text finishGameLabel)
     {
-        
+        _finishGameLabel = finishGameLabel;
     }
 
-    public void GameOver(string name, Color color)
+    public void GameOver(string name, string color)
     {
         _finishGameLabel.text = $"Вы проиграли. Вас убил {name} {color} цвета";
     }

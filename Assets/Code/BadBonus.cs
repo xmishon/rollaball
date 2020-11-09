@@ -6,21 +6,24 @@ namespace mzmeevskiy
 {
     public class BadBonus : InteractiveObject, IFly, IFlicker
     {
-        public event Action<string, Color> OnCaughtPlayerChange = delegate (string str, Color color) { };
+        public event Action<string, string> OnCaughtPlayerChange = delegate (string name, string color) { };
         private float _speedRotation;
         private float _lengthFly;
 
-        public event Action GoodBonusCaught;
+        private CustomColors.CustomColor customColor;
 
         private void Awake()
         {
             _speedRotation = Range(1.0f, 5.0f);
-            _lengthFly = Range(2.0f, 3.0f);
+            _lengthFly = Range(1.0f, 2.0f);
+
+            customColor = CustomColors.GetRandomColor();
+            GetComponent<Renderer>().material.color = CustomColors.GetColor(customColor);
         }
 
         protected override void Interaction()
         {
-            OnCaughtPlayerChange?.Invoke(gameObject.name, _color);
+            OnCaughtPlayerChange?.Invoke(gameObject.name, customColor.ToString());
         }
 
         public override void Execute()
@@ -30,7 +33,7 @@ namespace mzmeevskiy
                 return;
             }
             Fly();
-            Rotate();
+            Flicker();
         }
 
         public void Fly()
@@ -38,7 +41,7 @@ namespace mzmeevskiy
             transform.localPosition = new Vector3(transform.localPosition.x, Mathf.PingPong(Time.time, _lengthFly), transform.localPosition.z);
         }
 
-        public void Rotate()
+        public void Flicker()
         {
             transform.Rotate(Vector3.up * (Time.deltaTime * _speedRotation), Space.World);
         }

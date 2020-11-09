@@ -2,9 +2,15 @@
 
 namespace mzmeevskiy
 {
-    public class SoundController : MonoBehaviour
+    public class SoundController
     {
         [SerializeField] private AudioSource _audioSource;
+
+
+        public SoundController(AudioSource audioSource)
+        {
+            _audioSource = audioSource;
+        }
 
         public void PlayBonusPickupSound(int _bonusCount)
         {
