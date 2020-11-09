@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 287656714792507955}
   - component: {fileID: 287656714792507956}
   m_Layer: 0
-  m_Name: Bonus
+  m_Name: GoodBonus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -107,3 +107,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2365346826bae2143a2d5de575a7b42f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Point: 1

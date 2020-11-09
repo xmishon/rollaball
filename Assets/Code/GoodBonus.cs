@@ -6,20 +6,30 @@ namespace mzmeevskiy
 {
     public class GoodBonus : InteractiveObject, IFly, IFlicker
     {
+        public int Point = 1;
+        public event Action<int> OnPointChange = delegate (int i) { };
         private Material _material;
         private float _lengthFly;
-
-        public event Action GoodBonusCaught;
 
         private void Awake()
         {
             _material = GetComponent<Renderer>().material;
-            _lengthFly = Random.Range(2.0f, 4.0f);
+            _lengthFly = Random.Range(1.0f, 2.0f);
         }
 
         protected override void Interaction()
         {
-            GoodBonusCaught?.Invoke();
+            OnPointChange?.Invoke(Point);
+        }
+
+        public override void Execute()
+        {
+            if (!IsInteractable)
+            {
+                return;
+            }
+            Fly();
+            Flicker();
         }
 
         public void Fly()

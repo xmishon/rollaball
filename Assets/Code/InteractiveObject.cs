@@ -1,11 +1,23 @@
 ﻿using UnityEngine;
-using Random = UnityEngine.Random;
+using static UnityEngine.Random;
 
 namespace mzmeevskiy
 {
-    public abstract class InteractiveObject : MonoBehaviour, IInteractable
+    public abstract class InteractiveObject : MonoBehaviour, IExecute
     {
-        public bool IsInteractable { get; } = true;
+        protected Color _color;
+        private bool _isInteractable;
+
+        protected bool IsInteractable
+        {
+            get { return _isInteractable; }
+            private set
+            {
+                _isInteractable = value;
+                GetComponent<Renderer>().enabled = _isInteractable;
+                GetComponent<Collider>().enabled = _isInteractable;
+            }
+        }
 
         #region UnityMethods
 
@@ -16,23 +28,22 @@ namespace mzmeevskiy
                 return;
             }
             Interaction();
-            Destroy(gameObject);
+            IsInteractable = false;
         }
 
         #endregion
 
         protected abstract void Interaction();
 
+        public abstract void Execute();
+
         private void Start()
         {
-            DoAction();
-        }
-
-        public void DoAction()
-        {
+            IsInteractable = true;
+            _color = ColorHSV();
             if(TryGetComponent(out Renderer renderer))
             {
-                renderer.material.color = Random.ColorHSV();
+                renderer.material.color = _color;
             }
         }
     }

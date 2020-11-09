@@ -7,6 +7,11 @@ namespace mzmeevskiy
     {
         public event Action GameFinishedAction;
 
+        public override void Execute()
+        {
+            
+        }
+
         protected override void Interaction()
         {
             GameFinishedAction?.Invoke();
