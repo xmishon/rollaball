@@ -15,14 +15,14 @@ namespace mzmeevskiy
             // ---------------------------------------------------------------------------
             Debug.Log("---------------------------------");
             List<int> list = new List<int>() { 1, 2, 4, 2, 4, 5, 4, 2, 6, 1 };
-            Dictionary<int, int> result = Lists<int>.countFrequency(list);
+            Dictionary<int, int> result = list.countFrequency();
             foreach(KeyValuePair<int, int> pair in result)
             {
                 Debug.Log($"Элемент {pair.Key} встретился {pair.Value} раз.");
             }
             Debug.Log("---------------------------------");
             List<string> list2 = new List<string>() { "one", "two", "one", "four", "two", "four", "one", "one", "three" };
-            Dictionary<string, int> result2 = Lists<string>.countFrequency(list2);
+            Dictionary<string, int> result2 = list2.countFrequency();
             foreach(var pair in result2)
             {
                 Debug.Log($"Элемент {pair.Key} встретился {pair.Value} раз.");
@@ -51,9 +51,9 @@ namespace mzmeevskiy
         }
     }
 
-    public static class Lists<T>
+    public static class Lists
     {
-        public static Dictionary<T, int> countFrequency(List<T> list)
+        public static Dictionary<T, int> countFrequency<T>(this List<T> list)
         {
             Dictionary<T, int> result = new Dictionary<T, int>();
 
