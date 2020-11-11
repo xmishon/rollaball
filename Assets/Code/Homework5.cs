@@ -24,7 +24,7 @@ namespace mzmeevskiy
             Debug.Log("---------------------------------");
             List<string> list2 = new List<string>() { "one", "two", "one", "four", "two", "four", "one", "one", "three" };
             Dictionary<string, int> result2 = list2.countFrequency();
-            Dictionary<string, int> result3 = list2.countFrequencyLinqV2();
+            Dictionary<string, int> result3 = list2.countFrequencyLinq();
             foreach(var pair in result3)
             {
                 Debug.Log($"Элемент {pair.Key} встретился {pair.Value} раз.");
@@ -81,12 +81,9 @@ namespace mzmeevskiy
         {
             Dictionary<T, int> result = new Dictionary<T, int>();
 
-            var v = list.GroupBy(p => p).Select(g => new { Obj = g, Count = g.Count() });
+            var v = list.GroupBy(p => p).Select(g => new { Obj = g.Key, Count = g.Count() });
 
-            foreach(var item in v)
-            {
-                result.Add( item.Obj.Key, item.Count);
-            }
+            result = v.ToDictionary(g => g.Obj, f => f.Count) ;
 
             return result;
         }
@@ -96,11 +93,7 @@ namespace mzmeevskiy
             Dictionary<T, int> result = new Dictionary<T, int>();
 
             var v = from item in list group item by item;
-
-            foreach (IGrouping<T, T> item in v)
-            {
-                result.Add(item.Key, item.Count());
-            }
+            result = v.ToDictionary(g => g.Key, f => f.Count());
 
             return result;
         }
