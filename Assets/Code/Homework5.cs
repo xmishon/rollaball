@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using Object = System.Object;
 
 namespace mzmeevskiy
 {
@@ -23,7 +24,8 @@ namespace mzmeevskiy
             Debug.Log("---------------------------------");
             List<string> list2 = new List<string>() { "one", "two", "one", "four", "two", "four", "one", "one", "three" };
             Dictionary<string, int> result2 = list2.countFrequency();
-            foreach(var pair in result2)
+            Dictionary<string, int> result3 = list2.countFrequencyLinq();
+            foreach(var pair in result3)
             {
                 Debug.Log($"Элемент {pair.Key} встретился {pair.Value} раз.");
             }
@@ -70,6 +72,20 @@ namespace mzmeevskiy
                     }
                 }
                 result.Add(item, num);
+            }
+
+            return result;
+        }
+
+        public static Dictionary<T, int> countFrequencyLinq<T>(this List<T> list)
+        {
+            Dictionary<T, int> result = new Dictionary<T, int>();
+
+            var v = list.GroupBy(p => p).Select(g => new { Obj = g, Count = g.Count() });
+
+            foreach(var item in v)
+            {
+                result.Add( item.Obj.Key, item.Count);
             }
 
             return result;
