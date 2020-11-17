@@ -16,27 +16,33 @@ namespace mzmeevskiy
 
         private Button _restartButton;
         private int _countBonuses;
+        private Reference _reference;
 
         private void Awake()
         {
             Time.timeScale = 1.0f;
+            LoadNewGame();
+        }
+
+        private void LoadNewGame()
+        {
 
             _countBonuses = 0;
 
-            var reference = new Reference();
+            _reference = new Reference();
             _interactiveObjects = new ListExecuteObject();
 
-            _inputController = new InputController(reference.PlayerBall, reference.CameraRig);
+            _inputController = new InputController(_reference.PlayerBall, _reference.CameraRig);
             _interactiveObjects.AddExecuteObject(_inputController);
 
-            _soundController = new SoundController(reference.PlayerBall.GetComponent<AudioSource>());
-            _displayEndGame = new DisplayEndGame(reference.Canvas.transform.Find("GameFinishedText").GetComponent<Text>());
-            _displayBonuses = new DisplayBonuses(reference.Canvas.transform.Find("BonusesCountText").GetComponent<Text>());
-            
-            _cameraController = new CameraController(reference.PlayerBall.transform, reference.CameraRig);
+            _soundController = new SoundController(_reference.PlayerBall.GetComponent<AudioSource>());
+            _displayEndGame = new DisplayEndGame(_reference.Canvas.transform.Find("GameFinishedText").GetComponent<Text>());
+            _displayBonuses = new DisplayBonuses(_reference.Canvas.transform.Find("BonusesCountText").GetComponent<Text>());
+
+            _cameraController = new CameraController(_reference.PlayerBall.transform, _reference.CameraRig);
             _interactiveObjects.AddExecuteObject(_cameraController);
 
-            _restartButton = reference.RestartButton;
+            _restartButton = _reference.RestartButton;
             _restartButton.onClick.AddListener(Restart);
             _restartButton.gameObject.SetActive(false);
 
@@ -55,9 +61,38 @@ namespace mzmeevskiy
                 }
                 if (o is Finish finish)
                 {
-                    
+
                 }
             }
+        }
+
+        private void LoadSavedGame(SavedData savedData)
+        {
+            ClearScene();
+
+        }
+
+        private void ClearScene()
+        {
+            var interactiveObjects = Object.FindObjectsOfType<InteractiveObject>();
+            for (var i = 0; i < interactiveObjects.Length; i++)
+            {
+                if (interactiveObjects[i] is IExecute interactiveObject)
+                {
+                    Destroy(interactiveObjects[i]);
+                }
+            }
+            Destroy(_reference.PlayerBall);
+            Destroy(_reference.CameraRig);
+
+            _interactiveObjects = null;
+            _displayEndGame = null;
+            _displayBonuses = null;
+            _soundController = null;
+            _cameraController = null;
+            _inputController = null;
+
+            _countBonuses = 0;
         }
 
         private void CaughtPlayer(string value, string color)

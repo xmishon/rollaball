@@ -8,10 +8,18 @@ namespace mzmeevskiy
         private readonly PlayerBase _playerBase;
         private Transform _cameraPosition;
 
-        public InputController(PlayerBase player, GameObject cameraRig)
+        private readonly SaveDataRepository _saveDataRepository;
+        private readonly KeyCode _savePlayer = KeyCode.C;
+        private readonly KeyCode _loadPlayer = KeyCode.V;
+        private InteractiveObject[] _interactiveObjects;
+
+        public InputController(PlayerBase player, GameObject cameraRig, InteractiveObject interactiveObjects)
         {
             _playerBase = player;
             _cameraPosition = cameraRig.GetComponentInChildren<Camera>().transform;
+            _interactiveObjects = interactiveObjects;
+
+            _saveDataRepository = new SaveDataRepository();
         }
 
         public void Execute()
@@ -28,6 +36,16 @@ namespace mzmeevskiy
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 _playerBase.Jump();
+            }
+
+            if (Input.GetKeyDown(_savePlayer))
+            {
+                _saveDataRepository.Save(_interactiveObjects);
+            }
+
+            if (Input.GetKeyDown(_loadPlayer))
+            {
+                _saveDataRepository.Load(_playerBase);
             }
         }
     }
