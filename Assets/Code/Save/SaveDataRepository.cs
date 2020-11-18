@@ -8,7 +8,9 @@ namespace mzmeevskiy
     {
         private readonly IData<SavedData> _repository;
 
-        private List<GameObject> _objectsToSave;
+        private List<InteractiveObject> _interactiveObjects;
+        private PlayerBase _playerBase;
+        private GameObject _cameraRig;
 
         private SavedData _savedData;
 
@@ -18,71 +20,61 @@ namespace mzmeevskiy
 
         public SaveDataRepository()
         {
-            if (Application.platform == RuntimePlatform.WebGLPlayer)
-            {
-                _repository = new PlayerPrefsData();
-            }
-            else
-            {
-                _repository = new JsonData<SavedData>();
-                _path = Path.Combine(Application.dataPath, _folderName);
-            }
+            _repository = new JsonData<SavedData>();
+            _path = Path.Combine(Application.dataPath, _folderName);
             _savedData = new SavedData();
-            _objectsToSave = new List<GameObject>();
+            _interactiveObjects = new List<InteractiveObject>();
         }
 
         public void Save()
         {
+            _savedData.savedDataItmes = new List<SavedDataItem>();
             if (!Directory.Exists(Path.Combine(_path)))
             {
                 Directory.CreateDirectory(_path);
             }
-            foreach (var o in _objectsToSave)
+
+            foreach (var o in _interactiveObjects)
             {
                 var gameObject = new SavedDataItem
                 {
                     Position = o.transform.position,
-                    Name = o.name
+                    Name = o.name,
+                    IsInteractable = o.IsInteractable
                 };
-                InteractiveObject interactiveObject = null;
-                if (o.TryGetComponent<InteractiveObject>(out interactiveObject))
+                if (o is GoodBonus goodBonus)
                 {
-                    gameObject.IsEnabled = interactiveObject.enabled;
+                    gameObject.GameObjectType = GameObjectTypes.GoodBonus;
                 }
-                else
+                if (o is BadBonus badBonus)
                 {
-                    gameObject.IsEnabled = true;
+                    gameObject.GameObjectType = GameObjectTypes.BadBonus;
                 }
-
-                if (interactiveObject != null)
-                {
-                    if(interactiveObject is GoodBonus goodBonus)
-                    {
-                        gameObject.GameObjectType = GameObjectTypes.GoodBonus;
-                        continue;
-                    }
-                    if(interactiveObject is BadBonus badBonus)
-                    {
-                        gameObject.GameObjectType = GameObjectTypes.BadBonus;
-                        continue;
-                    }
-                }
-
-                PlayerBase playerBase; 
-                if(o.TryGetComponent<PlayerBase>(out playerBase))
-                {
-                    gameObject.GameObjectType = GameObjectTypes.Player;
-                    continue;
-                }
-
-                Camera camera = o.GetComponentInChildren<Camera>(); 
-                if (camera != null)
-                {
-                    gameObject.GameObjectType = GameObjectTypes.CameraRig;
-                    continue;
-                }
-
                 _savedData.savedDataItmes.Add(gameObject);
+            }
+
+            if (_playerBase != null)
+            {
+                var playerGameObject = new SavedDataItem
+                {
+                    Position = _playerBase.transform.position,
+                    Name = _playerBase.gameObject.name,
+                    IsInteractable = true,
+                    GameObjectType = GameObjectTypes.Player
+                };
+                _savedData.savedDataItmes.Add(playerGameObject);
+            }
+
+            if (_cameraRig != null)
+            {
+                var cameraRigGameObject = new SavedDataItem
+                {
+                    Position = _cameraRig.transform.position,
+                    Name = _cameraRig.gameObject.name,
+                    IsInteractable = true,
+                    GameObjectType = GameObjectTypes.CameraRig
+                };
+                _savedData.savedDataItmes.Add(cameraRigGameObject);
             }
 
             _repository.Save(_savedData, Path.Combine(_path, _fileName));
@@ -98,9 +90,19 @@ namespace mzmeevskiy
             Debug.Log(savedData);
         }
 
-        public void AddObjectToSave(GameObject gameObject)
+        public void AddObjectToSave(InteractiveObject gameObject)
         {
-            _objectsToSave.Add(gameObject);
+            _interactiveObjects.Add(gameObject);
+        }
+
+        public void SetPlayerBase(PlayerBase playerBase)
+        {
+            _playerBase = playerBase;
+        }
+
+        public void SetCameraRig(GameObject cameraRig)
+        {
+            _cameraRig = cameraRig;
         }
     }
 }

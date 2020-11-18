@@ -13,6 +13,7 @@ namespace mzmeevskiy
         private SoundController _soundController;
         private CameraController _cameraController;
         private InputController _inputController;
+        private SaveDataRepository _saveDataRepository;
 
         private Button _restartButton;
         private int _countBonuses;
@@ -46,18 +47,25 @@ namespace mzmeevskiy
             _restartButton.onClick.AddListener(Restart);
             _restartButton.gameObject.SetActive(false);
 
+            _saveDataRepository = new SaveDataRepository();
+            _saveDataRepository.SetPlayerBase(_reference.PlayerBall);
+            _saveDataRepository.SetCameraRig(_reference.CameraRig);
+            _inputController.OnSaveCall += _saveDataRepository.Save;
+
             foreach (var o in _interactiveObjects)
             {
                 if (o is GoodBonus goodBonus)
                 {
                     goodBonus.OnPointChange += AddBonus;
                     goodBonus.OnPointChange += _soundController.PlayBonusPickupSound;
+                    _saveDataRepository.AddObjectToSave(goodBonus);
                     continue;
                 }
                 if (o is BadBonus badBonus)
                 {
                     badBonus.OnCaughtPlayerChange += CaughtPlayer;
                     badBonus.OnCaughtPlayerChange += _displayEndGame.GameOver;
+                    _saveDataRepository.AddObjectToSave(badBonus);
                 }
                 if (o is Finish finish)
                 {

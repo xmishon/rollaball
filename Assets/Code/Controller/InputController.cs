@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using System;
 
 namespace mzmeevskiy
 {
@@ -8,18 +8,17 @@ namespace mzmeevskiy
         private readonly PlayerBase _playerBase;
         private Transform _cameraPosition;
 
+        public event Action OnSaveCall = delegate { };
+
         private readonly SaveDataRepository _saveDataRepository;
         private readonly KeyCode _savePlayer = KeyCode.C;
         private readonly KeyCode _loadPlayer = KeyCode.V;
         private InteractiveObject[] _interactiveObjects;
 
-        public InputController(PlayerBase player, GameObject cameraRig, InteractiveObject interactiveObjects)
+        public InputController(PlayerBase player, GameObject cameraRig)
         {
             _playerBase = player;
             _cameraPosition = cameraRig.GetComponentInChildren<Camera>().transform;
-            _interactiveObjects = interactiveObjects;
-
-            _saveDataRepository = new SaveDataRepository();
         }
 
         public void Execute()
@@ -40,12 +39,12 @@ namespace mzmeevskiy
 
             if (Input.GetKeyDown(_savePlayer))
             {
-                _saveDataRepository.Save(_interactiveObjects);
+                OnSaveCall.Invoke();
             }
 
             if (Input.GetKeyDown(_loadPlayer))
             {
-                _saveDataRepository.Load(_playerBase);
+                Debug.Log("Загрузка сохранений ещё не реализована");
             }
         }
     }

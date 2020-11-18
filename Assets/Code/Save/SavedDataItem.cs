@@ -3,14 +3,15 @@ using UnityEngine;
 
 namespace mzmeevskiy
 {
+    [Serializable]
     public class SavedDataItem
     {
         public string Name;
         public GameObjectTypes GameObjectType;
         public Vector3Serializable Position;
-        public bool IsEnabled;
+        public bool IsInteractable;
 
-        public override string ToString() => $"Name {Name} Position {Position} IsVisible {IsEnabled}";
+        public override string ToString() => $"Name {Name} Position {Position} IsVisible {IsInteractable}";
     }
 
     [Serializable]

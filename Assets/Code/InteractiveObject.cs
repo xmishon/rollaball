@@ -8,7 +8,7 @@ namespace mzmeevskiy
         protected Color _color;
         private bool _isInteractable;
 
-        protected bool IsInteractable
+        public bool IsInteractable
         {
             get { return _isInteractable; }
             private set

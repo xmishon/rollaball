@@ -1,3 +1,114 @@
-QdKGOxEFF
-K
-HEFFCAzEYC^CEDQrspWcYoDKHFON^X_OW
+{
+	"savedDataItmes": [
+		{
+			"Name": "Bonus",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 30.8700008392334,
+				"Y": 0.7988138198852539,
+				"Z": 47.279998779296878
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "Bonus (5)",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 45.342864990234378,
+				"Y": 0.22746562957763673,
+				"Z": -27.042007446289064
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "Bonus (6)",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 12.582265853881836,
+				"Y": 0.7860369682312012,
+				"Z": -48.15160369873047
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "Bonus (1)",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 8.726327896118164,
+				"Y": 0.2379293441772461,
+				"Z": -8.761566162109375
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "Bonus (3)",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 20.68000030517578,
+				"Y": 0.2254624366760254,
+				"Z": -26.790000915527345
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "Bonus (4)",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 22.780302047729493,
+				"Y": 0.8196730613708496,
+				"Z": -11.817703247070313
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "Bonus (2)",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 2.240000009536743,
+				"Y": 0.014014482498168946,
+				"Z": -8.761566162109375
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "Bonus (7)",
+			"GameObjectType": 1,
+			"Position": {
+				"X": 8.134493827819825,
+				"Y": 1.1881179809570313,
+				"Z": 24.9226131439209
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "BadBonus",
+			"GameObjectType": 0,
+			"Position": {
+				"X": 27.48200035095215,
+				"Y": 0.5021147727966309,
+				"Z": -11.430000305175782
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "PlayerBall(Clone)",
+			"GameObjectType": 2,
+			"Position": {
+				"X": 2.363288402557373,
+				"Y": 0.5,
+				"Z": 2.654501438140869
+			},
+			"IsInteractable": true
+		},
+		{
+			"Name": "CameraRig(Clone)",
+			"GameObjectType": 3,
+			"Position": {
+				"X": 0.0,
+				"Y": 1.9539999961853028,
+				"Z": 1.6799999475479127
+			},
+			"IsInteractable": true
+		}
+	]
+}
