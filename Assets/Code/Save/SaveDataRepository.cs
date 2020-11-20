@@ -11,12 +11,13 @@ namespace mzmeevskiy
         private List<InteractiveObject> _interactiveObjects;
         private PlayerBase _playerBase;
         private GameObject _cameraRig;
-
+        private Reference _reference;
         private SavedData _savedData;
 
         private const string _folderName = "dataSave";
         private const string _fileName = "data.txt";
         private readonly string _path;
+        private int _totalPoint;
 
         public SaveDataRepository()
         {
@@ -26,9 +27,14 @@ namespace mzmeevskiy
             _interactiveObjects = new List<InteractiveObject>();
         }
 
+        public void UpdateTotalPoint(int totalPoint)
+        {
+            _totalPoint = totalPoint;
+        }
+
         public void Save()
         {
-            _savedData.savedDataItmes = new List<SavedDataItem>();
+            _savedData.SavedDataItmes = new List<SavedDataItem>();
             if (!Directory.Exists(Path.Combine(_path)))
             {
                 Directory.CreateDirectory(_path);
@@ -50,7 +56,7 @@ namespace mzmeevskiy
                 {
                     gameObject.GameObjectType = GameObjectTypes.BadBonus;
                 }
-                _savedData.savedDataItmes.Add(gameObject);
+                _savedData.SavedDataItmes.Add(gameObject);
             }
 
             if (_playerBase != null)
@@ -62,7 +68,7 @@ namespace mzmeevskiy
                     IsInteractable = true,
                     GameObjectType = GameObjectTypes.Player
                 };
-                _savedData.savedDataItmes.Add(playerGameObject);
+                _savedData.SavedDataItmes.Add(playerGameObject);
             }
 
             if (_cameraRig != null)
@@ -74,20 +80,37 @@ namespace mzmeevskiy
                     IsInteractable = true,
                     GameObjectType = GameObjectTypes.CameraRig
                 };
-                _savedData.savedDataItmes.Add(cameraRigGameObject);
+                _savedData.SavedDataItmes.Add(cameraRigGameObject);
             }
+
+            _savedData.Points = _totalPoint;
 
             _repository.Save(_savedData, Path.Combine(_path, _fileName));
         }
 
-        public void Load(SavedData savedData)
+        public void Load()
         {
             var file = Path.Combine(_path, _fileName);
             if (!File.Exists(file)) return;
             var data = _repository.Load(file);
-            savedData = data;
+            
+            foreach (var o in _interactiveObjects)
+            {
+                Object.Destroy(o);
+            }
+            //Object.Destroy(_playerBase);
+            //Object.Destroy(_cameraRig);
 
-            Debug.Log(savedData);
+            foreach(var o in data.SavedDataItmes)
+            {
+                if (o.GameObjectType == GameObjectTypes.BadBonus)
+                {
+                    GameObject gameObject = GameObject.Instantiate(_reference.GoodBonus);
+                    gameObject.transform.position = o.Position;
+                    gameObject.GetComponent<InteractiveObject>().IsInteractable = o.IsInteractable;
+                    gameObject.name = o.Name;
+                }
+            }
         }
 
         public void AddObjectToSave(InteractiveObject gameObject)
@@ -103,6 +126,11 @@ namespace mzmeevskiy
         public void SetCameraRig(GameObject cameraRig)
         {
             _cameraRig = cameraRig;
+        }
+
+        public void SetReference(Reference reference)
+        {
+            _reference = reference;
         }
     }
 }

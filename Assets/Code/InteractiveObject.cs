@@ -11,7 +11,7 @@ namespace mzmeevskiy
         public bool IsInteractable
         {
             get { return _isInteractable; }
-            private set
+            set
             {
                 _isInteractable = value;
                 GetComponent<Renderer>().enabled = _isInteractable;

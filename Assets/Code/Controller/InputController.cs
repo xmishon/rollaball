@@ -9,6 +9,7 @@ namespace mzmeevskiy
         private Transform _cameraPosition;
 
         public event Action OnSaveCall = delegate { };
+        public event Action OnLoadCall = delegate { };
 
         private readonly SaveDataRepository _saveDataRepository;
         private readonly KeyCode _savePlayer = KeyCode.C;
@@ -44,7 +45,7 @@ namespace mzmeevskiy
 
             if (Input.GetKeyDown(_loadPlayer))
             {
-                Debug.Log("Загрузка сохранений ещё не реализована");
+                OnLoadCall.Invoke();
             }
         }
     }

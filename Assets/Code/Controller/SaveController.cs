@@ -5,21 +5,21 @@ namespace mzmeevskiy
 {
     public sealed class SaveController
     {
-        private List<GameObject> _saveData;
+        private List<GameObject> _objectsToSave;
 
         public SaveController()
         {
-            _saveData = new List<GameObject>();
+            _objectsToSave = new List<GameObject>();
         }
 
         public void Add(GameObject gameObject)
         {
-            _saveData.Add(gameObject);
+            _objectsToSave.Add(gameObject);
         }
 
         public List<GameObject> GetObjectsToSave()
         {
-            return _saveData;
+            return _objectsToSave;
         }
     }
 }

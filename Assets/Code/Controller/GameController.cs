@@ -1,12 +1,15 @@
-﻿using TMPro;
+﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace mzmeevskiy
 {
     public sealed class GameController : MonoBehaviour
     {
+        public event Action<int> TotalPointChanged = delegate (int i) { };
+
         private ListExecuteObject _interactiveObjects;
         private DisplayEndGame _displayEndGame;
         private DisplayBonuses _displayBonuses;
@@ -50,7 +53,11 @@ namespace mzmeevskiy
             _saveDataRepository = new SaveDataRepository();
             _saveDataRepository.SetPlayerBase(_reference.PlayerBall);
             _saveDataRepository.SetCameraRig(_reference.CameraRig);
+
             _inputController.OnSaveCall += _saveDataRepository.Save;
+            _inputController.OnLoadCall += _saveDataRepository.Load;
+            _inputController.OnLoadCall += Dispose;
+            TotalPointChanged += _saveDataRepository.UpdateTotalPoint;
 
             foreach (var o in _interactiveObjects)
             {
@@ -114,6 +121,7 @@ namespace mzmeevskiy
         {
             _countBonuses += value;
             _displayBonuses.Display(_countBonuses);
+            TotalPointChanged.Invoke(_countBonuses);
         }
 
         private void FixedUpdate()

@@ -7,7 +7,7 @@ namespace mzmeevskiy
     public sealed class SavedData
     {
         //public string Version = "1.0.0";
-        public List<SavedDataItem> savedDataItmes;
-
+        public List<SavedDataItem> SavedDataItmes;
+        public int Points;
     }
 }
