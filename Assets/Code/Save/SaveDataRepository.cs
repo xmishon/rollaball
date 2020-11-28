@@ -19,12 +19,15 @@ namespace mzmeevskiy
         private readonly string _path;
         private int _totalPoint;
 
-        public SaveDataRepository()
+        public SaveDataRepository(Reference reference)
         {
+            _interactiveObjects = new List<InteractiveObject>();
             _repository = new JsonData<SavedData>();
             _path = Path.Combine(Application.dataPath, _folderName);
             _savedData = new SavedData();
-            _interactiveObjects = new List<InteractiveObject>();
+            _reference = reference;
+            _cameraRig = _reference.CameraRig;
+            _playerBase = _reference.PlayerBall;
         }
 
         public void UpdateTotalPoint(int totalPoint)
@@ -42,6 +45,10 @@ namespace mzmeevskiy
 
             foreach (var o in _interactiveObjects)
             {
+                if (o.Equals(null))
+                {
+                    continue;
+                }
                 var gameObject = new SavedDataItem
                 {
                     Position = o.transform.position,
@@ -90,25 +97,52 @@ namespace mzmeevskiy
 
         public void Load()
         {
-            var file = Path.Combine(_path, _fileName);
+            Load(_fileName);
+        }
+
+        public void Load(string fileName)
+        {
+            var interactiveObjects = Object.FindObjectsOfType<InteractiveObject>();
+            for (var i = 0; i < interactiveObjects.Length; i++)
+            {
+                GameObject.Destroy(interactiveObjects[i].gameObject);
+            }
+
+            var file = Path.Combine(_path, fileName);
             if (!File.Exists(file)) return;
             var data = _repository.Load(file);
-            
-            foreach (var o in _interactiveObjects)
-            {
-                Object.Destroy(o);
-            }
-            //Object.Destroy(_playerBase);
-            //Object.Destroy(_cameraRig);
 
-            foreach(var o in data.SavedDataItmes)
+            foreach (var o in data.SavedDataItmes)
             {
-                if (o.GameObjectType == GameObjectTypes.BadBonus)
+                if (o.GameObjectType == GameObjectTypes.GoodBonus)
                 {
-                    GameObject gameObject = GameObject.Instantiate(_reference.GoodBonus);
+                    GameObject gameObject = _reference.GetNewGoodBonus();
                     gameObject.transform.position = o.Position;
                     gameObject.GetComponent<InteractiveObject>().IsInteractable = o.IsInteractable;
                     gameObject.name = o.Name;
+                    continue;
+                }
+                if (o.GameObjectType == GameObjectTypes.BadBonus)
+                {
+                    GameObject gameObject = _reference.GetNewBadBonus();
+                    gameObject.transform.position = o.Position;
+                    gameObject.GetComponent<InteractiveObject>().IsInteractable = o.IsInteractable;
+                    gameObject.name = o.Name;
+                    continue;
+                }
+                if (o.GameObjectType == GameObjectTypes.Player)
+                {
+                    PlayerBall playerBall = _reference.PlayerBall;
+                    playerBall.transform.position = o.Position;
+                    playerBall.name = o.Name;
+                    continue;
+                }
+                if (o.GameObjectType == GameObjectTypes.CameraRig)
+                {
+                    GameObject cameraRig = _reference.CameraRig;
+                    cameraRig.transform.position = o.Position;
+                    cameraRig.name = o.Name;
+                    continue;
                 }
             }
         }

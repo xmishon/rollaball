@@ -10,7 +10,7 @@ namespace mzmeevskiy
     {
         public event Action<int> TotalPointChanged = delegate (int i) { };
 
-        private ListExecuteObject _interactiveObjects;
+        private ListExecuteObject _executableObjects;
         private DisplayEndGame _displayEndGame;
         private DisplayBonuses _displayBonuses;
         private SoundController _soundController;
@@ -21,93 +21,20 @@ namespace mzmeevskiy
         private Button _restartButton;
         private int _countBonuses;
         private Reference _reference;
+        private bool _sceneReloaded;
 
         private void Awake()
         {
-            Time.timeScale = 1.0f;
-            LoadNewGame();
-        }
-
-        private void LoadNewGame()
-        {
-
-            _countBonuses = 0;
-
             _reference = new Reference();
-            _interactiveObjects = new ListExecuteObject();
 
-            _inputController = new InputController(_reference.PlayerBall, _reference.CameraRig);
-            _interactiveObjects.AddExecuteObject(_inputController);
+            _saveDataRepository = new SaveDataRepository(_reference);
+            _saveDataRepository.Load("newGameData.txt");
 
-            _soundController = new SoundController(_reference.PlayerBall.GetComponent<AudioSource>());
-            _displayEndGame = new DisplayEndGame(_reference.Canvas.transform.Find("GameFinishedText").GetComponent<Text>());
-            _displayBonuses = new DisplayBonuses(_reference.Canvas.transform.Find("BonusesCountText").GetComponent<Text>());
+            var go = _reference.GetNewGoodBonus();
+            InteractiveObject io = go.GetComponent<InteractiveObject>();
+            io.IsInteractable = false;
 
-            _cameraController = new CameraController(_reference.PlayerBall.transform, _reference.CameraRig);
-            _interactiveObjects.AddExecuteObject(_cameraController);
-
-            _restartButton = _reference.RestartButton;
-            _restartButton.onClick.AddListener(Restart);
-            _restartButton.gameObject.SetActive(false);
-
-            _saveDataRepository = new SaveDataRepository();
-            _saveDataRepository.SetPlayerBase(_reference.PlayerBall);
-            _saveDataRepository.SetCameraRig(_reference.CameraRig);
-
-            _inputController.OnSaveCall += _saveDataRepository.Save;
-            _inputController.OnLoadCall += _saveDataRepository.Load;
-            _inputController.OnLoadCall += Dispose;
-            TotalPointChanged += _saveDataRepository.UpdateTotalPoint;
-
-            foreach (var o in _interactiveObjects)
-            {
-                if (o is GoodBonus goodBonus)
-                {
-                    goodBonus.OnPointChange += AddBonus;
-                    goodBonus.OnPointChange += _soundController.PlayBonusPickupSound;
-                    _saveDataRepository.AddObjectToSave(goodBonus);
-                    continue;
-                }
-                if (o is BadBonus badBonus)
-                {
-                    badBonus.OnCaughtPlayerChange += CaughtPlayer;
-                    badBonus.OnCaughtPlayerChange += _displayEndGame.GameOver;
-                    _saveDataRepository.AddObjectToSave(badBonus);
-                }
-                if (o is Finish finish)
-                {
-
-                }
-            }
-        }
-
-        private void LoadSavedGame(SavedData savedData)
-        {
-            ClearScene();
-
-        }
-
-        private void ClearScene()
-        {
-            var interactiveObjects = Object.FindObjectsOfType<InteractiveObject>();
-            for (var i = 0; i < interactiveObjects.Length; i++)
-            {
-                if (interactiveObjects[i] is IExecute interactiveObject)
-                {
-                    Destroy(interactiveObjects[i]);
-                }
-            }
-            Destroy(_reference.PlayerBall);
-            Destroy(_reference.CameraRig);
-
-            _interactiveObjects = null;
-            _displayEndGame = null;
-            _displayBonuses = null;
-            _soundController = null;
-            _cameraController = null;
-            _inputController = null;
-
-            _countBonuses = 0;
+            Initialize();
         }
 
         private void CaughtPlayer(string value, string color)
@@ -126,14 +53,18 @@ namespace mzmeevskiy
 
         private void FixedUpdate()
         {
-            for(int i = 0; i < _interactiveObjects.Length; i++)
+            _sceneReloaded = false;
+            for(int i = 0; i < _executableObjects.Length; i++)
             {
-                var interactiveObject = _interactiveObjects[i];
-                if (interactiveObject == null)
+                if (_sceneReloaded)
+                {
+                    break;
+                }
+                var interactiveObject = _executableObjects[i];
+                if (interactiveObject.Equals(null))
                 {
                     continue;
                 }
-
                 interactiveObject.Execute();
             }
         }
@@ -141,11 +72,12 @@ namespace mzmeevskiy
         public void Restart()
         {
             SceneManager.LoadScene(0);
+            Debug.Log("Scene reloaded");
         }
 
         public void Dispose()
         {
-            foreach(var o in _interactiveObjects)
+            foreach(var o in _executableObjects)
             {
                 if (o is BadBonus badBonus)
                 {
@@ -159,6 +91,64 @@ namespace mzmeevskiy
                     goodBonus.OnPointChange -= _soundController.PlayBonusPickupSound;
                 }
             }
+            _inputController.OnLoadCall -= Dispose;
+            _inputController.OnLoadCall -= Load;
+            Debug.Log("Dispose");
+        }
+
+        public void Load()
+        {
+            _saveDataRepository.Load();
+            Initialize();
+        }
+
+        public void Initialize()
+        {
+            Time.timeScale = 1.0f;
+
+            _executableObjects = new ListExecuteObject();
+            _inputController = new InputController(_reference.PlayerBall, _reference.CameraRig);
+
+            _executableObjects.AddExecuteObject(_inputController);
+            
+            _inputController.OnLoadCall += MarkSceneReloaded;
+            _inputController.OnLoadCall += Dispose;
+            _inputController.OnLoadCall += Load;
+            _inputController.OnSaveCall += _saveDataRepository.Save;
+
+            _soundController = new SoundController(_reference.PlayerBall.GetComponent<AudioSource>());
+            _displayEndGame = new DisplayEndGame(_reference.Canvas.transform.Find("GameFinishedText").GetComponent<Text>());
+            _displayBonuses = new DisplayBonuses(_reference.Canvas.transform.Find("BonusesCountText").GetComponent<Text>());
+
+            _cameraController = new CameraController(_reference.PlayerBall.transform, _reference.CameraRig);
+            _executableObjects.AddExecuteObject(_cameraController);
+
+            _restartButton = _reference.RestartButton;
+            _restartButton.onClick.AddListener(Restart);
+            _restartButton.gameObject.SetActive(false);
+
+            foreach (var o in _executableObjects)
+            {
+                if (o is GoodBonus goodBonus)
+                {
+                    goodBonus.OnPointChange += AddBonus;
+                    goodBonus.OnPointChange += _soundController.PlayBonusPickupSound;
+                    _saveDataRepository.AddObjectToSave(goodBonus);
+                    continue;
+                }
+                if (o is BadBonus badBonus)
+                {
+                    badBonus.OnCaughtPlayerChange += CaughtPlayer;
+                    badBonus.OnCaughtPlayerChange += _displayEndGame.GameOver;
+                    _saveDataRepository.AddObjectToSave(badBonus);
+                }
+            }
+            Debug.Log("Initialize");
+        }
+
+        public void MarkSceneReloaded()
+        {
+            _sceneReloaded = true;
         }
     }
 }

@@ -39,7 +39,6 @@ namespace mzmeevskiy
 
         private void Start()
         {
-            IsInteractable = true;
             _color = ColorHSV();
             if(TryGetComponent(out Renderer renderer))
             {
