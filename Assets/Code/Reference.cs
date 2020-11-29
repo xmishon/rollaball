@@ -7,7 +7,6 @@ namespace mzmeevskiy
     {
         private PlayerBall _playerBall;
         private GameObject _cameraRig;
-        private GameObject _bonus;
         private GameObject _endGame;
         private Canvas _canvas;
         private Button _restartButton;
@@ -68,18 +67,16 @@ namespace mzmeevskiy
             }
         }
 
-        public GameObject GoodBonus
+        public GameObject GetNewGoodBonus()
         {
-            get
-            {
-                if (_bonus == null)
-                {
-                    var gameObject = Resources.Load<GameObject>("Bonus");
-                    _bonus = Object.Instantiate(gameObject);
-                }
+            var gameObject = Resources.Load<GameObject>("GoodBonus");
+            return Object.Instantiate(gameObject);
+        }
 
-                return _bonus;
-            }
+        public GameObject GetNewBadBonus()
+        {
+            var gameObject = Resources.Load<GameObject>("BadBonus");
+            return Object.Instantiate(gameObject);
         }
 
         public GameObject EndGame

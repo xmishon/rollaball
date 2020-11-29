@@ -8,10 +8,10 @@ namespace mzmeevskiy
         protected Color _color;
         private bool _isInteractable;
 
-        protected bool IsInteractable
+        public bool IsInteractable
         {
             get { return _isInteractable; }
-            private set
+            set
             {
                 _isInteractable = value;
                 GetComponent<Renderer>().enabled = _isInteractable;
@@ -39,7 +39,6 @@ namespace mzmeevskiy
 
         private void Start()
         {
-            IsInteractable = true;
             _color = ColorHSV();
             if(TryGetComponent(out Renderer renderer))
             {

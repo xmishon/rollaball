@@ -1,16 +1,32 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using System;
 
 namespace mzmeevskiy
 {
     public class InputController : IExecute
     {
-        private readonly PlayerBase _playerBase;
+        private PlayerBase _playerBase;
         private Transform _cameraPosition;
+
+        public event Action OnSaveCall = delegate { };
+        public event Action OnLoadCall = delegate { };
+
+        private readonly KeyCode _saveGame = KeyCode.C;
+        private readonly KeyCode _loadGame = KeyCode.V;
 
         public InputController(PlayerBase player, GameObject cameraRig)
         {
             _playerBase = player;
+            _cameraPosition = cameraRig.GetComponentInChildren<Camera>().transform;
+        }
+
+        public void SetPlayerBase(PlayerBase player)
+        {
+            _playerBase = player;
+        }
+
+        public void SetCameraPosition(GameObject cameraRig)
+        {
             _cameraPosition = cameraRig.GetComponentInChildren<Camera>().transform;
         }
 
@@ -28,6 +44,17 @@ namespace mzmeevskiy
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 _playerBase.Jump();
+            }
+
+            if (Input.GetKeyDown(_saveGame))
+            {
+                OnSaveCall.Invoke();
+            }
+
+            if (Input.GetKeyDown(_loadGame))
+            {
+                Debug.Log("LoadGame pressed");
+                OnLoadCall.Invoke();
             }
         }
     }
